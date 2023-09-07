@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using StoreAppWeb.Models;
 
 namespace StoreAppWeb.Data
 {
@@ -8,5 +9,7 @@ namespace StoreAppWeb.Data
         {
             
         }
+
+        public DbSet<Category> Categories { get; set; }
     }
 }
