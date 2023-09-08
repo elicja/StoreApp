@@ -26,6 +26,11 @@ namespace StoreAppWeb.Controllers
         [HttpPost]
         public IActionResult Create(Category category)
         {
+            if (category.Name == category.DisplayOrder.ToString())
+            {
+                ModelState.AddModelError("name", "Name of the category and isplay order cannot be the same.");
+            }
+
             if (ModelState.IsValid)
             {
                 _db.Categories.Add(category);
