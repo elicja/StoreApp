@@ -17,5 +17,18 @@ namespace StoreAppWeb.Controllers
             List<Category> categoryList = _db.Categories.ToList();
             return View(categoryList);
         }
+
+        public IActionResult Create()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public IActionResult Create(Category category)
+        {
+            _db.Categories.Add(category);
+            _db.SaveChanges();
+            return RedirectToAction("Index");
+        }
     }
 }
