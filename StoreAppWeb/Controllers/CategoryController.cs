@@ -40,5 +40,34 @@ namespace StoreAppWeb.Controllers
             }
             return View();
         }
+
+        public IActionResult Edit(int? categoryId)
+        {
+            if (categoryId == null || categoryId == default)
+            {
+                return NotFound();
+            }
+            Category categoryFromDb = _db.Categories.FirstOrDefault(c => c.Id == categoryId);
+
+            if (categoryFromDb == null)
+            {
+                return NotFound();
+            }
+
+            return View(categoryFromDb);
+        }
+
+        [HttpPost]
+        public IActionResult Edit(Category category)
+        {
+            if (ModelState.IsValid)
+            {
+                _db.Categories.Update(category);
+                _db.SaveChanges();
+
+                return RedirectToAction("Index");
+            }
+            return View();
+        }
     }
 }
