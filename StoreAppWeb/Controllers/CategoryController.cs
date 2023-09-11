@@ -36,6 +36,8 @@ namespace StoreAppWeb.Controllers
                 _db.Categories.Add(category);
                 _db.SaveChanges();
 
+                TempData["success"] = "Category created successfully";
+
                 return RedirectToAction("Index");
             }
             return View();
@@ -65,9 +67,44 @@ namespace StoreAppWeb.Controllers
                 _db.Categories.Update(category);
                 _db.SaveChanges();
 
+                TempData["success"] = "Category updated successfully";
+
                 return RedirectToAction("Index");
             }
             return View();
+        }
+
+        public IActionResult Delete(int? categoryId)
+        {
+            if (categoryId == null || categoryId == default)
+            {
+                return NotFound();
+            }
+            Category categoryFromDb = _db.Categories.FirstOrDefault(c => c.Id == categoryId);
+
+            if (categoryFromDb == null)
+            {
+                return NotFound();
+            }
+
+            return View(categoryFromDb);
+        }
+
+        [HttpPost, ActionName("Delete")]
+        public IActionResult DeletePOST(int? categoryId)
+        {
+            Category categoryFromDb = _db.Categories.FirstOrDefault(c => c.Id == categoryId);
+
+            if (categoryFromDb == null)
+            {
+                return NotFound();
+            }
+            _db.Categories.Remove(categoryFromDb);
+            _db.SaveChanges();
+
+            TempData["success"] = "Category deleted successfully";
+
+            return RedirectToAction("Index");
         }
     }
 }
