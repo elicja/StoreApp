@@ -1,3 +1,5 @@
+using DataAccess.IRepositories;
+using DataAccess.Repositories;
 using Microsoft.EntityFrameworkCore;
 using StoreApp.DataAccess.Data;
 
@@ -6,7 +8,9 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 builder.Services.AddDbContext<AppDbContext>(opts => 
-    opts.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))); 
+    opts.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 
 var app = builder.Build();
 

@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using DataAccess.IRepositories;
+using Microsoft.EntityFrameworkCore;
 using StoreApp.DataAccess.Data;
 using System;
 using System.Collections.Generic;
@@ -7,7 +8,7 @@ using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DataAccess.Repository
+namespace DataAccess.Repositories
 {
     public class Repository<T> : IRepository<T> where T : class
     {
