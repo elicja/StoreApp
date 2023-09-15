@@ -1,4 +1,5 @@
 ﻿using DataAccess.IRepositories;
+using Models;
 using StoreApp.DataAccess.Data;
 using StoreApp.Models;
 using System;
@@ -10,18 +11,18 @@ using System.Threading.Tasks;
 
 namespace DataAccess.Repositories
 {
-    public class CategoryRepository : Repository<Category>, ICategoryRepository
+    public class ProductRepository : Repository<Product>, IProductRepository
     {
         private AppDbContext _db;
 
-        public CategoryRepository(AppDbContext db) : base(db)
+        public ProductRepository(AppDbContext db) : base(db)
         {
             _db = db;
         }
 
-        public void Update(Category category)
+        public void Update(Product product)
         {
-            _db.Categories.Update(category);
+            _db.Products.Update(product);
         }
     }
 }
