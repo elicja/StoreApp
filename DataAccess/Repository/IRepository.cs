@@ -5,9 +5,9 @@ using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DataAccess.Repository.IRepository
+namespace DataAccess.Repository
 {
-    internal interface IRepository<T> where T : class
+    public interface IRepository<T> where T : class
     {
         //T - Category
         IEnumerable<T> GetAll();
