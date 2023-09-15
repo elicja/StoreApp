@@ -1,27 +1,27 @@
 ﻿using DataAccess.IRepositories;
 using StoreApp.DataAccess.Data;
-using StoreApp.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace DataAccess.Repositories
 {
-    public class CategoryRepository : Repository<Category>, ICategoryRepository
+    public class UnitOfWork : IUnitOfWork
     {
         private AppDbContext _db;
+        public ICategoryRepository CategoryRepo { get; private set; }
 
-        public CategoryRepository(AppDbContext db) : base(db)
+        public UnitOfWork(AppDbContext db)
         {
             _db = db;
+            CategoryRepo = new CategoryRepository(_db);
         }
 
-        public void Update(Category category)
+        public void Save()
         {
-            _db.Update(category);
+            _db.SaveChanges();
         }
     }
 }
