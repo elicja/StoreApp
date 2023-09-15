@@ -3,19 +3,21 @@ using Microsoft.AspNetCore.Mvc;
 using StoreApp.DataAccess.Data;
 using StoreApp.Models;
 
-namespace StoreAppWeb.Controllers
+namespace StoreAppWeb.Areas.Admin.Controllers
 {
+
+    [Area("Admin")]
     public class CategoryController : Controller
     {
-        private readonly ICategoryRepository _categoryRepo;
-        public CategoryController(ICategoryRepository categoryRepo)
+        private readonly IUnitOfWork _unitOfWork;
+        public CategoryController(IUnitOfWork unitOfWork)
         {
-            _categoryRepo = categoryRepo;
+            _unitOfWork = unitOfWork;
         }
 
         public IActionResult Index()
         {
-            List<Category> categoryList = _categoryRepo.GetAll().ToList();
+            List<Category> categoryList = _unitOfWork.CategoryRepo.GetAll().ToList();
             return View(categoryList);
         }
 
@@ -34,8 +36,8 @@ namespace StoreAppWeb.Controllers
 
             if (ModelState.IsValid)
             {
-                _categoryRepo.Add(category);
-                _categoryRepo.Save();
+                _unitOfWork.CategoryRepo.Add(category);
+                _unitOfWork.Save();
 
                 TempData["success"] = "Category created successfully";
 
@@ -50,7 +52,7 @@ namespace StoreAppWeb.Controllers
             {
                 return NotFound();
             }
-            Category categoryFromDb = _categoryRepo.Get(c => c.Id == categoryId);
+            Category categoryFromDb = _unitOfWork.CategoryRepo.Get(c => c.Id == categoryId);
 
             if (categoryFromDb == null)
             {
@@ -65,8 +67,8 @@ namespace StoreAppWeb.Controllers
         {
             if (ModelState.IsValid)
             {
-                _categoryRepo.Update(category);
-                _categoryRepo.Save();
+                _unitOfWork.CategoryRepo.Update(category);
+                _unitOfWork.Save();
 
                 TempData["success"] = "Category updated successfully";
 
@@ -81,7 +83,7 @@ namespace StoreAppWeb.Controllers
             {
                 return NotFound();
             }
-            Category categoryFromDb = _categoryRepo.Get(c => c.Id == categoryId);
+            Category categoryFromDb = _unitOfWork.CategoryRepo.Get(c => c.Id == categoryId);
 
             if (categoryFromDb == null)
             {
@@ -94,14 +96,14 @@ namespace StoreAppWeb.Controllers
         [HttpPost, ActionName("Delete")]
         public IActionResult DeletePOST(int? categoryId)
         {
-            Category categoryFromDb = _categoryRepo.Get(c => c.Id == categoryId);
+            Category categoryFromDb = _unitOfWork.CategoryRepo.Get(c => c.Id == categoryId);
 
             if (categoryFromDb == null)
             {
                 return NotFound();
             }
-            _categoryRepo.Delete(categoryFromDb);
-            _categoryRepo.Save();
+            _unitOfWork.CategoryRepo.Delete(categoryFromDb);
+            _unitOfWork.Save();
 
             TempData["success"] = "Category deleted successfully";
 
