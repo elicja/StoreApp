@@ -5,7 +5,6 @@ using StoreApp.Models;
 
 namespace StoreAppWeb.Areas.Admin.Controllers
 {
-
     [Area("Admin")]
     public class CategoryController : Controller
     {
