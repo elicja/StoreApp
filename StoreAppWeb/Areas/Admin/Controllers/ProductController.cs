@@ -1,6 +1,8 @@
 ﻿using DataAccess.IRepositories;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Models;
+using Models.ViewModels;
 using NuGet.Common;
 using StoreApp.Models;
 
@@ -19,27 +21,47 @@ namespace StoreAppWeb.Areas.Admin.Controllers
         public IActionResult Index()
         {
             List<Product> productList = _unitOfWork.ProductRepo.GetAll().ToList();
+
             return View(productList);
         }
 
         public IActionResult Create()
         {
-            return View();
+            ProductVM productVM = new()
+            {
+                CategoryList = _unitOfWork.CategoryRepo.GetAll().Select(c => new SelectListItem()
+                {
+                    Text = c.Name,
+                    Value = c.Id.ToString()
+                }),
+                Product = new Product()
+            };
+
+            return View(productVM);
         }
 
         [HttpPost]
-        public IActionResult Create(Product product)
+        public IActionResult Create(ProductVM productVM)
         {
             if (ModelState.IsValid)
             {
-                _unitOfWork.ProductRepo.Add(product);
+                _unitOfWork.ProductRepo.Add(productVM.Product);
                 _unitOfWork.Save();
 
                 TempData["success"] = "Product created successfully";
 
                 return RedirectToAction("Index");
             }
-            return View();
+            else
+            {
+                productVM.CategoryList = _unitOfWork.CategoryRepo.GetAll().Select(c => new SelectListItem()
+                {
+                    Text = c.Name,
+                    Value = c.Id.ToString()
+                });
+
+                return View(productVM);
+            }
         }
 
         public IActionResult Edit(int? productId)
