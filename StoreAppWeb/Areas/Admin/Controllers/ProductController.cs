@@ -68,7 +68,7 @@ namespace StoreAppWeb.Areas.Admin.Controllers
                         file.CopyTo(fileStream);
                     }
 
-                    productVM.Product.ImgUrl = @"\imgs\product" + fileName;
+                    productVM.Product.ImgUrl = @"\imgs\product\" + fileName;
                 }
 
                 _unitOfWork.ProductRepo.Add(productVM.Product);
