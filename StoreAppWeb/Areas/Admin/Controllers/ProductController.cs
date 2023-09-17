@@ -22,7 +22,7 @@ namespace StoreAppWeb.Areas.Admin.Controllers
 
         public IActionResult Index()
         {
-            List<Product> productList = _unitOfWork.ProductRepo.GetAll().ToList();
+            List<Product> productList = _unitOfWork.ProductRepo.GetAll(includeProperties:"Category").ToList();
 
             return View(productList);
         }
