@@ -141,5 +141,17 @@ namespace StoreAppWeb.Areas.Admin.Controllers
 
             return RedirectToAction("Index");
         }
+
+        #region ApiCalls
+
+        [HttpGet]
+        public IActionResult GetAll()
+        {
+            List<Product> productList = _unitOfWork.ProductRepo.GetAll(includeProperties: "Category").ToList();
+
+            return Json(new { data = productList });
+        }
+
+        #endregion
     }
 }
