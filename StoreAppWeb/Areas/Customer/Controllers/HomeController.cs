@@ -48,7 +48,20 @@ namespace StoreAppWeb.Areas.Customer.Controllers
 
             shoppingCart.AppUserId = userId;
 
-            _unitOfWork.ShoppingCartRepo.Add(shoppingCart);
+            ShoppingCart shoppingCartFromDb = _unitOfWork.ShoppingCartRepo.Get(s => s.AppUserId == userId
+                && s.ProductId == shoppingCart.ProductId);
+
+            if (shoppingCartFromDb != null)
+            {
+                shoppingCartFromDb.Count += shoppingCart.Count;
+
+                _unitOfWork.ShoppingCartRepo.Update(shoppingCartFromDb);
+            }
+            else
+            {
+                _unitOfWork.ShoppingCartRepo.Add(shoppingCart);
+            }
+
             _unitOfWork.Save();
 
             return RedirectToAction(nameof(Index));
