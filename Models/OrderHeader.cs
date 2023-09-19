@@ -13,7 +13,7 @@ namespace Models
     public class OrderHeader
     {
         public int Id { get; set; }
-        public string AppUserId { get; set; }
+        public int AppUserId { get; set; }
 
         [ForeignKey("AppUserId")]
         [ValidateNever]
