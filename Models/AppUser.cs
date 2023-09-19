@@ -11,7 +11,7 @@ namespace Models
     public class AppUser : IdentityUser
     {
         [Required]
-        public int Name { get; set; }
+        public string Name { get; set; }
 
         public string? StreetAddres { get; set; }
         public string? City { get; set; }
