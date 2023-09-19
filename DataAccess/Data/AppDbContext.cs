@@ -28,6 +28,37 @@ namespace StoreApp.DataAccess.Data
                 new Category { Id = 3, Name = "History", DisplayOrder = 3 }
                 );
 
+            modelBuilder.Entity<Company>().HasData(
+                new Company
+                {
+                    Id = 1,
+                    Name = "Technopol",
+                    StreetAddress = "123 Street",
+                    City = "Warsaw",
+                    State = "IL",
+                    PhoneNumber = "123333444"
+                },
+
+                new Company
+                {
+                    Id = 2, 
+                    Name = "Testownia", 
+                    StreetAddress = "Test 88",
+                    City = "New York",
+                    State = "NY",
+                    PhoneNumber = "111000222"
+                },
+
+                new Company
+                {
+                    Id = 3, 
+                    Name = "Books", 
+                    StreetAddress = "999 BookStreet",
+                    City = "Amsterdam",
+                    State = "IL",
+                    PhoneNumber = "888777666"
+                });
+
             modelBuilder.Entity<Product>().HasData(
                 new Product()
                 {
