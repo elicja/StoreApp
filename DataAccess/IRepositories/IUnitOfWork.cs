@@ -10,6 +10,7 @@ namespace DataAccess.IRepositories
     {
         ICategoryRepository CategoryRepo { get; }
         IProductRepository ProductRepo { get; }
+        ICompanyRepository CompanyRepo { get; }
 
         void Save();
     }
