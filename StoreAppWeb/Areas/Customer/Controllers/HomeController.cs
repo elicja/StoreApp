@@ -27,9 +27,14 @@ namespace StoreAppWeb.Areas.Customer.Controllers
 
         public IActionResult Details(int productId)
         {
-            Product product = _unitOfWork.ProductRepo.Get(p => p.Id == productId, includeProperties: "Category");
+            ShoppingCart cart = new()
+            {
+                Product = _unitOfWork.ProductRepo.Get(p => p.Id == productId, includeProperties: "Category"),
+                Count = 1,
+                ProductId = productId
+            };
 
-            return View(product);
+            return View(cart);
         }
 
         public IActionResult Privacy()
