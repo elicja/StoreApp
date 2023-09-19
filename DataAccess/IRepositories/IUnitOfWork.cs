@@ -13,6 +13,8 @@ namespace DataAccess.IRepositories
         ICompanyRepository CompanyRepo { get; }
         IShoppingCartRepository ShoppingCartRepo { get; }
         IAppUserRepository AppUserRepo { get; }
+        IOrderDetailRepository OrderDetailRepo { get; }
+        IOrderHeaderRepository OrderHeaderRepo { get; }
 
         void Save();
     }
