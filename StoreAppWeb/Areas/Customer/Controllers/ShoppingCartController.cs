@@ -28,13 +28,14 @@ namespace StoreAppWeb.Areas.Customer.Controllers
             ShoppingCartVM = new()
             {
                 ShoppingCartList = _unitOfWork.ShoppingCartRepo.GetAll(s => s.AppUserId == userId,
-                    includeProperties: "Product")
+                    includeProperties: "Product"),
+                OrderHeader = new()
             };
 
             foreach (var scart in ShoppingCartVM.ShoppingCartList)
             {
                 scart.Price = GetPriceByQuantity(scart);
-                ShoppingCartVM.OrderTotal += (scart.Price * scart.Count);
+                ShoppingCartVM.OrderHeader.OrderTotal += (scart.Price * scart.Count);
             }
 
             return View(ShoppingCartVM);
@@ -42,7 +43,32 @@ namespace StoreAppWeb.Areas.Customer.Controllers
 
         public IActionResult OrderSummary()
         {
-            return View();
+            var claimsIdentity = (ClaimsIdentity)User.Identity;
+            var userId = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier).Value;
+
+            ShoppingCartVM = new()
+            {
+                ShoppingCartList = _unitOfWork.ShoppingCartRepo.GetAll(s => s.AppUserId == userId,
+                    includeProperties: "Product"),
+                OrderHeader = new()
+            };
+
+            ShoppingCartVM.OrderHeader.AppUser = _unitOfWork.AppUserRepo.Get(u => u.Id == userId);
+
+            ShoppingCartVM.OrderHeader.Name = ShoppingCartVM.OrderHeader.AppUser.Name;
+            ShoppingCartVM.OrderHeader.PhoneNumber = ShoppingCartVM.OrderHeader.AppUser.PhoneNumber;
+            ShoppingCartVM.OrderHeader.StreetAddress = ShoppingCartVM.OrderHeader.AppUser.StreetAddres;
+            ShoppingCartVM.OrderHeader.City = ShoppingCartVM.OrderHeader.AppUser.City;
+            ShoppingCartVM.OrderHeader.State = ShoppingCartVM.OrderHeader.AppUser.State;
+            ShoppingCartVM.OrderHeader.PostalCode = ShoppingCartVM.OrderHeader.AppUser.PostalCode;
+
+            foreach (var scart in ShoppingCartVM.ShoppingCartList)
+            {
+                scart.Price = GetPriceByQuantity(scart);
+                ShoppingCartVM.OrderHeader.OrderTotal += (scart.Price * scart.Count);
+            }
+
+            return View(ShoppingCartVM);
         }
 
         public IActionResult Plus(int shoppingCartId)
