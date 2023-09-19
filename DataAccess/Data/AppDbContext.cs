@@ -36,6 +36,7 @@ namespace StoreApp.DataAccess.Data
                     StreetAddress = "123 Street",
                     City = "Warsaw",
                     State = "IL",
+                    PostalCode = "11111",
                     PhoneNumber = "123333444"
                 },
 
@@ -46,6 +47,7 @@ namespace StoreApp.DataAccess.Data
                     StreetAddress = "Test 88",
                     City = "New York",
                     State = "NY",
+                    PostalCode = "22222",
                     PhoneNumber = "111000222"
                 },
 
@@ -56,6 +58,7 @@ namespace StoreApp.DataAccess.Data
                     StreetAddress = "999 BookStreet",
                     City = "Amsterdam",
                     State = "IL",
+                    PostalCode = "33333",
                     PhoneNumber = "888777666"
                 });
 
