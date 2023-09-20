@@ -87,7 +87,7 @@ namespace StoreAppWeb.Areas.Customer.Controllers
             ShoppingCartVM.OrderHeader.OrderDate = System.DateTime.Now;
             ShoppingCartVM.OrderHeader.AppUserId = userId;
 
-			ShoppingCartVM.OrderHeader.AppUser = _unitOfWork.AppUserRepo.Get(u => u.Id == userId);
+			AppUser appUser = _unitOfWork.AppUserRepo.Get(u => u.Id == userId);
 
 			foreach (var scart in ShoppingCartVM.ShoppingCartList)
 			{
@@ -95,13 +95,15 @@ namespace StoreAppWeb.Areas.Customer.Controllers
 				ShoppingCartVM.OrderHeader.OrderTotal += (scart.Price * scart.Count);
 			}
 
-            if (ShoppingCartVM.OrderHeader.AppUser.CompanyId.GetValueOrDefault() == 0)
+            if (appUser.CompanyId.GetValueOrDefault() == 0)
             {
+                // Regular customer
                 ShoppingCartVM.OrderHeader.PaymentStatus = StaticDetails.PaymentStatusPending;
                 ShoppingCartVM.OrderHeader.OrderStatus = StaticDetails.StatusPending;
             }
             else
             {
+                // Company user
 				ShoppingCartVM.OrderHeader.PaymentStatus = StaticDetails.PaymentStatusDelayed;
 				ShoppingCartVM.OrderHeader.OrderStatus = StaticDetails.StatusApproved;
 			}
@@ -123,8 +125,19 @@ namespace StoreAppWeb.Areas.Customer.Controllers
                 _unitOfWork.Save();
             }
 
-			return View(ShoppingCartVM);
+			if (appUser.CompanyId.GetValueOrDefault() == 0)
+			{
+				ShoppingCartVM.OrderHeader.PaymentStatus = StaticDetails.PaymentStatusPending;
+				ShoppingCartVM.OrderHeader.OrderStatus = StaticDetails.StatusPending;
+			}
+
+			return RedirectToAction(nameof(OrderConfirmation), new { orderId = ShoppingCartVM.OrderHeader.Id });
 		}
+
+        public IActionResult OrderConfirmation(int orderId)
+        {
+            return View(orderId);
+        }
 
 		public IActionResult Plus(int shoppingCartId)
         {
