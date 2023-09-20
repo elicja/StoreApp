@@ -5,6 +5,7 @@ using Models;
 
 namespace StoreAppWeb.Areas.Admin.Controllers
 {
+	[Area("Admin")]
 	public class OrderController : Controller
 	{
 		private readonly IUnitOfWork _unitOfWork;
