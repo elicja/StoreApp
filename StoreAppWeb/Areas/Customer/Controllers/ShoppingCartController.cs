@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Models;
 using Models.ViewModels;
+using Stripe.Checkout;
 using System.Security.Claims;
 using Utility;
 
@@ -127,16 +128,74 @@ namespace StoreAppWeb.Areas.Customer.Controllers
 
 			if (appUser.CompanyId.GetValueOrDefault() == 0)
 			{
-				ShoppingCartVM.OrderHeader.PaymentStatus = StaticDetails.PaymentStatusPending;
-				ShoppingCartVM.OrderHeader.OrderStatus = StaticDetails.StatusPending;
+                var domain = "https://localhost:7102/";
+
+				var options = new SessionCreateOptions
+				{
+					SuccessUrl = domain + $"Customer/ShoppingCart/OrderConfirmation?id={ShoppingCartVM.OrderHeader.Id}",
+                    CancelUrl = domain + "Customer/ShoppingCart/Index",
+					LineItems = new List<SessionLineItemOptions>(),
+					Mode = "payment",
+				};
+
+                foreach (var item in ShoppingCartVM.ShoppingCartList)
+                {
+                    var sessionLineItem = new SessionLineItemOptions()
+                    {
+                        PriceData = new SessionLineItemPriceDataOptions()
+                        {
+                            UnitAmount = (long)(item.Price * 100),
+                            Currency = "pln",
+                            ProductData = new SessionLineItemPriceDataProductDataOptions()
+                            {
+                                Name = item.Product.Title
+                            }
+                        },
+                        Quantity = item.Count
+                    };
+
+                    options.LineItems.Add(sessionLineItem);
+                }
+
+				var service = new SessionService();
+				Session session = service.Create(options);
+
+                _unitOfWork.OrderHeaderRepo.UpdateStripePaymentId(ShoppingCartVM.OrderHeader.Id, session.Id, session.PaymentIntentId);
+                _unitOfWork.Save();
+
+                Response.Headers.Add("Location", session.Url);
+
+                return new StatusCodeResult(303);
 			}
 
-			return RedirectToAction(nameof(OrderConfirmation), new { orderId = ShoppingCartVM.OrderHeader.Id });
+			return RedirectToAction(nameof(OrderConfirmation), new { id = ShoppingCartVM.OrderHeader.Id });
 		}
 
-        public IActionResult OrderConfirmation(int orderId)
+        public IActionResult OrderConfirmation(int id)
         {
-            return View(orderId);
+            OrderHeader orderHeader = _unitOfWork.OrderHeaderRepo.Get(o => o.Id == id, includeProperties: "AppUser");
+
+            if (orderHeader.PaymentStatus != StaticDetails.PaymentStatusDelayed)
+            {
+                var service = new SessionService();
+
+                Session session = service.Get(orderHeader.SessionId);
+
+                if (session.PaymentStatus.ToLower() == "paid")
+                {
+					_unitOfWork.OrderHeaderRepo.UpdateStripePaymentId(id, session.Id, session.PaymentIntentId);
+                    _unitOfWork.OrderHeaderRepo.UpdateStatus(id, StaticDetails.StatusApproved, StaticDetails.PaymentStatusApproved);
+                    _unitOfWork.Save();
+				}
+            }
+
+            List<ShoppingCart> shoppingCarts = _unitOfWork.ShoppingCartRepo
+                .GetAll(s => s.AppUserId == orderHeader.AppUserId).ToList();
+
+            _unitOfWork.ShoppingCartRepo.DeleteFew(shoppingCarts);
+            _unitOfWork.Save();
+
+            return View(id);
         }
 
 		public IActionResult Plus(int shoppingCartId)
