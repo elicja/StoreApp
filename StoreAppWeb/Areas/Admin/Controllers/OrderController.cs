@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Models;
+using Models.ViewModels;
 using System.Diagnostics;
 using Utility;
 
@@ -22,9 +23,20 @@ namespace StoreAppWeb.Areas.Admin.Controllers
 			return View();
 		}
 
-		#region ApiCalls
+        public IActionResult Details(int orderId)
+        {
+            OrderVM orderVM = new()
+            {
+                OrderHeader = _unitOfWork.OrderHeaderRepo.Get(o => o.Id == orderId, includeProperties: "AppUser"),
+                OrderDetail = _unitOfWork.OrderDetailRepo.GetAll(o => o.OrderHeaderId == orderId, includeProperties: "Product")
+            };
 
-		[HttpGet]
+            return View(orderVM);
+        }
+
+        #region ApiCalls
+
+        [HttpGet]
 		public IActionResult GetAll(string status)
 		{
 			IEnumerable<OrderHeader> orderHeaders = _unitOfWork.OrderHeaderRepo.GetAll(includeProperties: "AppUser").ToList();
