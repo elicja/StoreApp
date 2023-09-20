@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore.Metadata;
 using Models;
 using Models.ViewModels;
 using System.Security.Claims;
+using Utility;
 
 namespace StoreAppWeb.Areas.Customer.Controllers
 {
@@ -13,6 +14,8 @@ namespace StoreAppWeb.Areas.Customer.Controllers
     public class ShoppingCartController : Controller
     {
         private readonly IUnitOfWork _unitOfWork;
+
+        [BindProperty]
         public ShoppingCartVM ShoppingCartVM { get; set; }
 
         public ShoppingCartController(IUnitOfWork unitOfWork)
@@ -71,7 +74,59 @@ namespace StoreAppWeb.Areas.Customer.Controllers
             return View(ShoppingCartVM);
         }
 
-        public IActionResult Plus(int shoppingCartId)
+        [HttpPost]
+        [ActionName("OrderSummary")]
+		public IActionResult OrderSummaryPOST()
+		{
+			var claimsIdentity = (ClaimsIdentity)User.Identity;
+			var userId = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier).Value;
+
+            ShoppingCartVM.ShoppingCartList = _unitOfWork.ShoppingCartRepo.GetAll(s => s.AppUserId == userId,
+                    includeProperties: "Product");
+
+            ShoppingCartVM.OrderHeader.OrderDate = System.DateTime.Now;
+            ShoppingCartVM.OrderHeader.AppUserId = userId;
+
+			ShoppingCartVM.OrderHeader.AppUser = _unitOfWork.AppUserRepo.Get(u => u.Id == userId);
+
+			foreach (var scart in ShoppingCartVM.ShoppingCartList)
+			{
+				scart.Price = GetPriceByQuantity(scart);
+				ShoppingCartVM.OrderHeader.OrderTotal += (scart.Price * scart.Count);
+			}
+
+            if (ShoppingCartVM.OrderHeader.AppUser.CompanyId.GetValueOrDefault() == 0)
+            {
+                ShoppingCartVM.OrderHeader.PaymentStatus = StaticDetails.PaymentStatusPending;
+                ShoppingCartVM.OrderHeader.OrderStatus = StaticDetails.StatusPending;
+            }
+            else
+            {
+				ShoppingCartVM.OrderHeader.PaymentStatus = StaticDetails.PaymentStatusDelayed;
+				ShoppingCartVM.OrderHeader.OrderStatus = StaticDetails.StatusApproved;
+			}
+
+            _unitOfWork.OrderHeaderRepo.Add(ShoppingCartVM.OrderHeader);
+            _unitOfWork.Save();
+
+            foreach (var cart in ShoppingCartVM.ShoppingCartList)
+            {
+                OrderDetail orderDetail = new()
+                {
+                    ProductId = cart.ProductId,
+                    OrderHeaderId = ShoppingCartVM.OrderHeader.Id,
+                    Price = cart.Price,
+                    Count = cart.Count
+                };
+
+                _unitOfWork.OrderDetailRepo.Add(orderDetail);
+                _unitOfWork.Save();
+            }
+
+			return View(ShoppingCartVM);
+		}
+
+		public IActionResult Plus(int shoppingCartId)
         {
             var shoppingCartFromDb = _unitOfWork.ShoppingCartRepo.Get(s => s.Id == shoppingCartId);
 
