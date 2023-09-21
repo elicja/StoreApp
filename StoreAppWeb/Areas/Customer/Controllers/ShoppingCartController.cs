@@ -212,7 +212,7 @@ namespace StoreAppWeb.Areas.Customer.Controllers
 
         public IActionResult Minus(int shoppingCartId)
         {
-            var shoppingCartFromDb = _unitOfWork.ShoppingCartRepo.Get(s => s.Id == shoppingCartId);
+            var shoppingCartFromDb = _unitOfWork.ShoppingCartRepo.Get(s => s.Id == shoppingCartId, tracked: true);
 
             if (shoppingCartFromDb.Count <= 1)
             {
@@ -235,7 +235,7 @@ namespace StoreAppWeb.Areas.Customer.Controllers
 
         public IActionResult Delete(int shoppingCartId)
         {
-            var shoppingCartFromDb = _unitOfWork.ShoppingCartRepo.Get(s => s.Id == shoppingCartId);
+            var shoppingCartFromDb = _unitOfWork.ShoppingCartRepo.Get(s => s.Id == shoppingCartId, tracked: true);
 
             HttpContext.Session.SetInt32(StaticDetails.SessionShoppingCart, _unitOfWork.ShoppingCartRepo
                 .GetAll(s => s.AppUserId == shoppingCartFromDb.AppUserId).Count() - 1);
