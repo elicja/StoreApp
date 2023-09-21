@@ -98,7 +98,7 @@ namespace StoreAppWeb.Areas.Admin.Controllers
 
             if (orderHeader.PaymentStatus == StaticDetails.PaymentStatusDelayed)
             {
-                orderHeader.PaymentDueDate = DateOnly.FromDateTime(DateTime.Now.AddDays(30));
+                orderHeader.PaymentDueDate = DateTime.Now.AddDays(30);
             }
 
             _unitOfWork.OrderHeaderRepo.Update(orderHeader);
