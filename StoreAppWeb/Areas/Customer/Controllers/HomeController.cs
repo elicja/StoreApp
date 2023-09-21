@@ -5,6 +5,7 @@ using Models;
 using StoreApp.Models;
 using System.Diagnostics;
 using System.Security.Claims;
+using Utility;
 
 namespace StoreAppWeb.Areas.Customer.Controllers
 {
@@ -22,6 +23,15 @@ namespace StoreAppWeb.Areas.Customer.Controllers
 
         public IActionResult Index()
         {
+            var claimsIdentity = (ClaimsIdentity)User.Identity;
+            var claim = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier);
+
+            if (claim != null)
+            {
+                HttpContext.Session.SetInt32(StaticDetails.SessionShoppingCart,
+                    _unitOfWork.ShoppingCartRepo.GetAll(s => s.AppUserId == claim.Value).Count());
+            }
+
             IEnumerable<Product> productList = _unitOfWork.ProductRepo.GetAll(includeProperties: "Category");
 
             return View(productList);
@@ -56,15 +66,18 @@ namespace StoreAppWeb.Areas.Customer.Controllers
                 shoppingCartFromDb.Count += shoppingCart.Count;
 
                 _unitOfWork.ShoppingCartRepo.Update(shoppingCartFromDb);
+                _unitOfWork.Save();
             }
             else
             {
                 _unitOfWork.ShoppingCartRepo.Add(shoppingCart);
+                _unitOfWork.Save();
+
+                HttpContext.Session.SetInt32(StaticDetails.SessionShoppingCart,
+                    _unitOfWork.ShoppingCartRepo.GetAll(s => s.AppUserId == userId).Count());
             }
 
             TempData["success"] = "Cart updated successfully";
-
-            _unitOfWork.Save();
 
             return RedirectToAction(nameof(Index));
         }
