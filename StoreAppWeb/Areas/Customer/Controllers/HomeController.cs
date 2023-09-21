@@ -23,15 +23,6 @@ namespace StoreAppWeb.Areas.Customer.Controllers
 
         public IActionResult Index()
         {
-            var claimsIdentity = (ClaimsIdentity)User.Identity;
-            var claim = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier);
-
-            if (claim != null)
-            {
-                HttpContext.Session.SetInt32(StaticDetails.SessionShoppingCart,
-                    _unitOfWork.ShoppingCartRepo.GetAll(s => s.AppUserId == claim.Value).Count());
-            }
-
             IEnumerable<Product> productList = _unitOfWork.ProductRepo.GetAll(includeProperties: "Category");
 
             return View(productList);

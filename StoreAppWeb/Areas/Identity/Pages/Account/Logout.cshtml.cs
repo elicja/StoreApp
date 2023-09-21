@@ -27,8 +27,6 @@ namespace StoreAppWeb.Areas.Identity.Pages.Account
         {
             await _signInManager.SignOutAsync();
 
-            HttpContext.Session.Clear();
-
             _logger.LogInformation("User logged out.");
             if (returnUrl != null)
             {
