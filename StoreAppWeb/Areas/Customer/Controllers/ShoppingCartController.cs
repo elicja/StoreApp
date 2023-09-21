@@ -61,7 +61,7 @@ namespace StoreAppWeb.Areas.Customer.Controllers
 
             ShoppingCartVM.OrderHeader.Name = ShoppingCartVM.OrderHeader.AppUser.Name;
             ShoppingCartVM.OrderHeader.PhoneNumber = ShoppingCartVM.OrderHeader.AppUser.PhoneNumber;
-            ShoppingCartVM.OrderHeader.StreetAddress = ShoppingCartVM.OrderHeader.AppUser.StreetAddres;
+            ShoppingCartVM.OrderHeader.StreetAddress = ShoppingCartVM.OrderHeader.AppUser.StreetAddress;
             ShoppingCartVM.OrderHeader.City = ShoppingCartVM.OrderHeader.AppUser.City;
             ShoppingCartVM.OrderHeader.State = ShoppingCartVM.OrderHeader.AppUser.State;
             ShoppingCartVM.OrderHeader.PostalCode = ShoppingCartVM.OrderHeader.AppUser.PostalCode;
