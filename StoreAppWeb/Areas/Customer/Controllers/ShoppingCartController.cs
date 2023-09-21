@@ -187,6 +187,8 @@ namespace StoreAppWeb.Areas.Customer.Controllers
                     _unitOfWork.OrderHeaderRepo.UpdateStatus(id, StaticDetails.StatusApproved, StaticDetails.PaymentStatusApproved);
                     _unitOfWork.Save();
 				}
+
+                HttpContext.Session.Clear();
             }
 
             List<ShoppingCart> shoppingCarts = _unitOfWork.ShoppingCartRepo
