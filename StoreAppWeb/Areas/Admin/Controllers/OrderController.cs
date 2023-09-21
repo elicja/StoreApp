@@ -1,9 +1,11 @@
 ﻿using DataAccess.IRepositories;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Models;
 using Models.ViewModels;
 using System.Diagnostics;
+using System.Security.Claims;
 using Utility;
 
 namespace StoreAppWeb.Areas.Admin.Controllers
@@ -12,6 +14,9 @@ namespace StoreAppWeb.Areas.Admin.Controllers
 	public class OrderController : Controller
 	{
 		private readonly IUnitOfWork _unitOfWork;
+
+        [BindProperty]
+        public OrderVM OrderVM { get; set; }
 
         public OrderController(IUnitOfWork unitOfWork)
         {
@@ -25,13 +30,44 @@ namespace StoreAppWeb.Areas.Admin.Controllers
 
         public IActionResult Details(int orderId)
         {
-            OrderVM orderVM = new()
+            OrderVM = new()
             {
                 OrderHeader = _unitOfWork.OrderHeaderRepo.Get(o => o.Id == orderId, includeProperties: "AppUser"),
                 OrderDetail = _unitOfWork.OrderDetailRepo.GetAll(o => o.OrderHeaderId == orderId, includeProperties: "Product")
             };
 
-            return View(orderVM);
+            return View(OrderVM);
+        }
+
+        [HttpPost]
+        [Authorize(Roles = StaticDetails.Role_Admin + "," + StaticDetails.Role_Employee)]
+        public IActionResult UpdateOrderDetail()
+        {
+            var orderHeaderFromDb = _unitOfWork.OrderHeaderRepo.Get(o => o.Id == OrderVM.OrderHeader.Id);
+
+            orderHeaderFromDb.Name = OrderVM.OrderHeader.Name;
+            orderHeaderFromDb.PhoneNumber = OrderVM.OrderHeader.PhoneNumber;
+            orderHeaderFromDb.StreetAddress = OrderVM.OrderHeader.StreetAddress;
+            orderHeaderFromDb.City = OrderVM.OrderHeader.City;
+            orderHeaderFromDb.State = OrderVM.OrderHeader.State;
+            orderHeaderFromDb.PostalCode = OrderVM.OrderHeader.PostalCode;
+
+            if (!string.IsNullOrEmpty(OrderVM.OrderHeader.Carrier))
+            {
+                orderHeaderFromDb.Carrier = OrderVM.OrderHeader.Carrier;
+            }
+
+            if (!string.IsNullOrEmpty(OrderVM.OrderHeader.TrackingNumber))
+            {
+                orderHeaderFromDb.Carrier = OrderVM.OrderHeader.TrackingNumber;
+            }
+
+            _unitOfWork.OrderHeaderRepo.Update(orderHeaderFromDb);
+            _unitOfWork.Save();
+
+            TempData["Success"] = "Order Details Updated Successfully";
+
+            return RedirectToAction(nameof(Details), new { orderId = orderHeaderFromDb.Id });
         }
 
         #region ApiCalls
@@ -39,9 +75,21 @@ namespace StoreAppWeb.Areas.Admin.Controllers
         [HttpGet]
 		public IActionResult GetAll(string status)
 		{
-			IEnumerable<OrderHeader> orderHeaders = _unitOfWork.OrderHeaderRepo.GetAll(includeProperties: "AppUser").ToList();
+            IEnumerable<OrderHeader> orderHeaders;
 
-			switch (status)
+            if (User.IsInRole(StaticDetails.Role_Admin) || User.IsInRole(StaticDetails.Role_Employee))
+            {
+                orderHeaders = _unitOfWork.OrderHeaderRepo.GetAll(includeProperties: "AppUser").ToList();
+            }
+            else
+            {
+                var claimIdentity = (ClaimsIdentity)User.Identity;
+                var userId = claimIdentity.FindFirst(ClaimTypes.NameIdentifier).Value;
+
+                orderHeaders = _unitOfWork.OrderHeaderRepo.GetAll(o => o.AppUserId == userId, includeProperties: "AppUser");
+            }
+
+            switch (status)
 			{
                 case "pending":
                     orderHeaders = orderHeaders.Where(o => o.PaymentStatus == StaticDetails.PaymentStatusDelayed);
