@@ -10,5 +10,6 @@ namespace DataAccess.IRepositories
 {
     public interface IAppUserRepository : IRepository<AppUser>
     {
+        public void Update(AppUser appUser);
     }
 }
