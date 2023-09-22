@@ -128,7 +128,7 @@ namespace StoreAppWeb.Areas.Customer.Controllers
 
 			if (appUser.CompanyId.GetValueOrDefault() == 0)
 			{
-                var domain = "https://localhost:7102/";
+                var domain = Request.Scheme + "://" + Request.Host.Value + "/";
 
 				var options = new SessionCreateOptions
 				{

@@ -151,7 +151,7 @@ namespace StoreAppWeb.Areas.Admin.Controllers
             OrderVM.OrderDetail = _unitOfWork.OrderDetailRepo
                 .GetAll(o => o.OrderHeaderId == OrderVM.OrderHeader.Id, includeProperties: "Product");
 
-            var domain = "https://localhost:7102/";
+            var domain = Request.Scheme + "://" + Request.Host.Value + "/";
 
             var options = new SessionCreateOptions
             {
