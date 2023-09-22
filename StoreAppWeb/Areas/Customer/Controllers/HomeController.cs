@@ -23,7 +23,7 @@ namespace StoreAppWeb.Areas.Customer.Controllers
 
         public IActionResult Index()
         {
-            IEnumerable<Product> productList = _unitOfWork.ProductRepo.GetAll(includeProperties: "Category");
+            IEnumerable<Product> productList = _unitOfWork.ProductRepo.GetAll(includeProperties: "Category,ProductImgs");
 
             return View(productList);
         }
@@ -32,7 +32,7 @@ namespace StoreAppWeb.Areas.Customer.Controllers
         {
             ShoppingCart shoppingCart = new()
             {
-                Product = _unitOfWork.ProductRepo.Get(p => p.Id == productId, includeProperties: "Category"),
+                Product = _unitOfWork.ProductRepo.Get(p => p.Id == productId, includeProperties: "Category,ProductImgs"),
                 Count = 1,
                 ProductId = productId
             };

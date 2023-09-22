@@ -25,7 +25,7 @@ namespace StoreAppWeb.Areas.Admin.Controllers
 
         public IActionResult Index()
         {
-            List<Product> productList = _unitOfWork.ProductRepo.GetAll(includeProperties:"Category").ToList();
+            List<Product> productList = _unitOfWork.ProductRepo.GetAll(includeProperties: "Category").ToList();
 
             return View(productList);
         }
@@ -171,13 +171,20 @@ namespace StoreAppWeb.Areas.Admin.Controllers
                 return Json(new { success = false, message = "Error while deleting" });
             }
 
-            //var oldImgPath = Path.Combine(_webHostEnvironment.WebRootPath,
-            //                              productToDelete.ImgUrl.TrimStart('\\'));
+            string productPath = @"imgs\products\product-" + id;
+            string finalPath = Path.Combine(_webHostEnvironment.WebRootPath, productPath);
 
-            //if (System.IO.File.Exists(oldImgPath))
-            //{
-            //    System.IO.File.Delete(oldImgPath);
-            //}
+            if (Directory.Exists(finalPath))
+            {
+                string[] filePaths = Directory.GetFiles(finalPath);
+
+                foreach (string filePath in filePaths)
+                {
+                    System.IO.File.Delete(filePath);
+                }
+
+                Directory.Delete(finalPath);
+            }
 
             _unitOfWork.ProductRepo.Delete(productToDelete);
             _unitOfWork.Save();
