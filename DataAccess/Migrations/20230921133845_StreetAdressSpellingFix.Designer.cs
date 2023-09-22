@@ -747,13 +747,13 @@ namespace DataAccess.Migrations
 
             modelBuilder.Entity("Models.AppUser", b =>
                 {
-                    b.HasOne("Models.Company", "company")
+                    b.HasOne("Models.Company", "Company")
                         .WithMany()
                         .HasForeignKey("CompanyId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("company");
+                    b.Navigation("Company");
                 });
 #pragma warning restore 612, 618
         }

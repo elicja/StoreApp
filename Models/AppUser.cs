@@ -23,6 +23,9 @@ namespace Models
 
         [ForeignKey("CompanyId")]
         [ValidateNever]
-        public Company company { get; set; }
+        public Company? Company { get; set; }
+
+        [NotMapped]
+        public string Role { get; set; }
     }
 }

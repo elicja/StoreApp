@@ -33,7 +33,24 @@ namespace StoreAppWeb.Areas.Admin.Controllers
         [HttpGet]
         public IActionResult GetAll()
         {
-            List<AppUser> usersList = _db.AppUsers.Include(u => u.company).ToList();
+            List<AppUser> usersList = _db.AppUsers.Include(u => u.Company).ToList();
+
+            var userRoles = _db.UserRoles.ToList();
+            var roles = _db.Roles.ToList();
+
+            foreach (var user in usersList)
+            {
+                var roleId = userRoles.FirstOrDefault(u => u.UserId == user.Id).RoleId;
+                user.Role = roles.FirstOrDefault(u => u.Id == roleId).Name;
+
+                if (user.Company == null)
+                {
+                    user.Company = new() 
+                    { 
+                        Name = ""
+                    };
+                }
+            }
 
             return Json(new { data = usersList });
         }
