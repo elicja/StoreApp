@@ -28,6 +28,32 @@ namespace StoreAppWeb.Areas.Admin.Controllers
             return View();
         }
 
+        public IActionResult RoleManagment(string userId)
+        {
+            string roleId = _db.UserRoles.FirstOrDefault(r => r.UserId == userId).RoleId;
+
+            RoleManagmentVM roleVM = new RoleManagmentVM()
+            {
+                AppUser = _db.AppUsers.Include(u => u.Company).FirstOrDefault(u => u.Id == userId),
+
+                RoleList = _db.Roles.Select(i => new SelectListItem()
+                {
+                    Text = i.Name,
+                    Value = i.Name
+                }),
+
+                CompanyList = _db.Companies.Select(i => new SelectListItem()
+                {
+                    Text = i.Name,
+                    Value = i.Id.ToString()
+                })
+            };
+
+            roleVM.AppUser.Role = _db.Roles.FirstOrDefault(r => r.Id == roleId).Name;
+
+            return View(roleVM);
+        }
+
         #region ApiCalls
 
         [HttpGet]
