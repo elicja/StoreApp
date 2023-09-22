@@ -15,6 +15,7 @@ namespace DataAccess.IRepositories
         IAppUserRepository AppUserRepo { get; }
         IOrderDetailRepository OrderDetailRepo { get; }
         IOrderHeaderRepository OrderHeaderRepo { get; }
+        IProductImgRepository ProductImgRepo { get; }
 
         void Save();
     }
