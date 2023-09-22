@@ -1,5 +1,6 @@
 ﻿using DataAccess.IRepositories;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -17,10 +18,12 @@ namespace StoreAppWeb.Areas.Admin.Controllers
     public class UserController : Controller
     {
         private readonly AppDbContext _db;
+        private readonly UserManager<IdentityUser> _userManager;
 
-        public UserController(AppDbContext db)
+        public UserController(AppDbContext db, UserManager<IdentityUser> userManager)
         {
             _db = db;
+            _userManager = userManager;
         }
 
         public IActionResult Index()
@@ -52,6 +55,35 @@ namespace StoreAppWeb.Areas.Admin.Controllers
             roleVM.AppUser.Role = _db.Roles.FirstOrDefault(r => r.Id == roleId).Name;
 
             return View(roleVM);
+        }
+
+        [HttpPost]
+        public IActionResult RoleManagment(RoleManagmentVM roleManagmentVM)
+        {
+            string roleId = _db.UserRoles.FirstOrDefault(r => r.UserId == roleManagmentVM.AppUser.Id).RoleId;
+            string oldRole = _db.Roles.FirstOrDefault(r => r.Id == roleId).Name;
+
+            if (!(roleManagmentVM.AppUser.Role == oldRole))
+            {
+                AppUser appUser = _db.AppUsers.FirstOrDefault(u => u.Id == roleManagmentVM.AppUser.Id);
+
+                if (roleManagmentVM.AppUser.Role == StaticDetails.Role_Company)
+                {
+                    appUser.CompanyId = roleManagmentVM.AppUser.CompanyId;
+                }
+
+                if (oldRole == StaticDetails.Role_Company)
+                {
+                    appUser.CompanyId = null;
+                }
+
+                _db.SaveChanges();
+
+                _userManager.RemoveFromRoleAsync(appUser, oldRole).GetAwaiter().GetResult();
+                _userManager.AddToRoleAsync(appUser, roleManagmentVM.AppUser.Role).GetAwaiter().GetResult();
+            }
+
+            return RedirectToAction("Index");
         }
 
         #region ApiCalls
