@@ -55,10 +55,28 @@ namespace StoreAppWeb.Areas.Admin.Controllers
             return Json(new { data = usersList });
         }
 
-        [HttpDelete]
-        public IActionResult Delete(int? id)
+        [HttpPost]
+        public IActionResult LockUnlock([FromBody]string id)
         {
-            return Json(new { success = true, message = "Delete Successful" });
+            var userFromDb = _db.AppUsers.FirstOrDefault(u => u.Id == id);
+
+            if (userFromDb == null)
+            {
+                return Json(new { success = false, message = "Error while Locking/Unlocking" });
+            }
+
+            if (userFromDb.LockoutEnd != null && userFromDb.LockoutEnd > DateTime.Now)
+            {
+                userFromDb.LockoutEnd = DateTime.Now;
+            }
+            else
+            {
+                userFromDb.LockoutEnd = DateTime.Now.AddYears(1000);
+            }
+
+            _db.SaveChanges();
+
+            return Json(new { success = true, message = "Operation Successful" });
         }
 
         #endregion
