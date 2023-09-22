@@ -36,10 +36,10 @@ namespace DataAccess.Repositories
                 productFromDb.CategoryId = product.CategoryId;
                 productFromDb.Author = product.Author;
 
-                if (productFromDb.ImgUrl != null)
-                {
-                    productFromDb.ImgUrl = product.ImgUrl;
-                }
+                //if (productFromDb.ImgUrl != null)
+                //{
+                //    productFromDb.ImgUrl = product.ImgUrl;
+                //}
             }
         }
     }

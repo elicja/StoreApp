@@ -5,10 +5,22 @@
 namespace DataAccess.Migrations
 {
     /// <inheritdoc />
-    public partial class AddImageUrlProduct : Migration
+    public partial class RemovingImgs : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
+        {
+            migrationBuilder.DropColumn(
+                name: "ImgUrl",
+                table: "Products");
+
+            migrationBuilder.DropColumn(
+                name: "Testing",
+                table: "Products");
+        }
+
+        /// <inheritdoc />
+        protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.AddColumn<string>(
                 name: "ImgUrl",
@@ -17,55 +29,54 @@ namespace DataAccess.Migrations
                 nullable: false,
                 defaultValue: "");
 
+            migrationBuilder.AddColumn<int>(
+                name: "Testing",
+                table: "Products",
+                type: "int",
+                nullable: false,
+                defaultValue: 0);
+
             migrationBuilder.UpdateData(
                 table: "Products",
                 keyColumn: "Id",
                 keyValue: 1,
-                column: "ImgUrl",
-                value: "");
+                columns: new[] { "ImgUrl", "Testing" },
+                values: new object[] { "", 0 });
 
             migrationBuilder.UpdateData(
                 table: "Products",
                 keyColumn: "Id",
                 keyValue: 2,
-                column: "ImgUrl",
-                value: "");
+                columns: new[] { "ImgUrl", "Testing" },
+                values: new object[] { "", 0 });
 
             migrationBuilder.UpdateData(
                 table: "Products",
                 keyColumn: "Id",
                 keyValue: 3,
-                column: "ImgUrl",
-                value: "");
+                columns: new[] { "ImgUrl", "Testing" },
+                values: new object[] { "", 0 });
 
             migrationBuilder.UpdateData(
                 table: "Products",
                 keyColumn: "Id",
                 keyValue: 4,
-                column: "ImgUrl",
-                value: "");
+                columns: new[] { "ImgUrl", "Testing" },
+                values: new object[] { "", 0 });
 
             migrationBuilder.UpdateData(
                 table: "Products",
                 keyColumn: "Id",
                 keyValue: 5,
-                column: "ImgUrl",
-                value: "");
+                columns: new[] { "ImgUrl", "Testing" },
+                values: new object[] { "", 0 });
 
             migrationBuilder.UpdateData(
                 table: "Products",
                 keyColumn: "Id",
                 keyValue: 6,
-                column: "ImgUrl",
-                value: "");
-        }
-
-        /// <inheritdoc />
-        protected override void Down(MigrationBuilder migrationBuilder)
-        {
-            migrationBuilder.DropColumn(
-                name: "ImgUrl",
-                table: "Products");
+                columns: new[] { "ImgUrl", "Testing" },
+                values: new object[] { "", 0 });
         }
     }
 }
