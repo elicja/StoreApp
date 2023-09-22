@@ -52,5 +52,8 @@ namespace Models
         [ForeignKey("CategoryId")]
         [ValidateNever]
         public Category Category { get; set; }
+
+        [ValidateNever]
+        public List<ProductImg> ProductImgs { get; set; }
     }
 }
