@@ -48,7 +48,7 @@ namespace StoreAppWeb.Areas.Admin.Controllers
             }
             else
             {
-                productVM.Product = _unitOfWork.ProductRepo.Get(p => p.Id == id);
+                productVM.Product = _unitOfWork.ProductRepo.Get(p => p.Id == id, includeProperties: "ProductImgs");
 
                 return View(productVM);
             }
@@ -122,6 +122,33 @@ namespace StoreAppWeb.Areas.Admin.Controllers
 
                 return View(productVM);
             }
+        }
+
+        public IActionResult DeleteImg(int imgId)
+        {
+            var imgToDelete = _unitOfWork.ProductImgRepo.Get(i => i.Id == imgId);
+            int productId = imgToDelete.ProductId;
+
+            if (imgToDelete != null)
+            {
+                if (!string.IsNullOrEmpty(imgToDelete.ImgUrl))
+                {
+                    var oldImgPath = Path.Combine(_webHostEnvironment.WebRootPath,
+                                                  imgToDelete.ImgUrl.TrimStart('\\'));
+
+                    if (System.IO.File.Exists(oldImgPath))
+                    {
+                        System.IO.File.Delete(oldImgPath);
+                    }
+                }
+
+                _unitOfWork.ProductImgRepo.Delete(imgToDelete);
+                _unitOfWork.Save();
+
+                TempData["success"] = "Deleted successfully";
+            }
+
+            return RedirectToAction(nameof(Upsert), new { id = productId });
         }
 
         #region ApiCalls
