@@ -25,7 +25,7 @@ namespace DataAccess.Repositories
 
         public void Add(T entity)
         {
-            dbSet.Add(entity);
+            dbSet.Add(entity);           
         }
 
         public void Delete(T entity)

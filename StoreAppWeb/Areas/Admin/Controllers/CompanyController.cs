@@ -1,11 +1,7 @@
 ﻿using DataAccess.IRepositories;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Models;
-using Models.ViewModels;
-using NuGet.Common;
-using StoreApp.Models;
 using Utility;
 
 namespace StoreAppWeb.Areas.Admin.Controllers
@@ -15,7 +11,6 @@ namespace StoreAppWeb.Areas.Admin.Controllers
     public class CompanyController : Controller
     {
         private readonly IUnitOfWork _unitOfWork;
-        private readonly IWebHostEnvironment _webHostEnvironment;
 
         public CompanyController(IUnitOfWork unitOfWork)
         {
